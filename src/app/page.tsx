@@ -1,3 +1,4 @@
+import FileUpload from "@/components/FileUpload";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
@@ -14,11 +15,11 @@ export default async function Home() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center">
-            <h1 className="mr-3 text-5xl font-semibold">Chat with any PDF</h1>
+            <h1 className="mr-3 text-4xl font-bold">Chat with any PDF</h1>
             <UserButton afterSignOutUrl="/" />
           </div>
 
-          <div className="flex mt-2">
+          <div className="flex my-5">
             {isAuth && <Button>Go to chats</Button>}
           </div>
 
@@ -29,7 +30,7 @@ export default async function Home() {
 
           <div className="w-full mt-4">
             {isAuth ? (
-              <h1>File upload</h1>
+              <FileUpload/>
             ) : (
               <a href="/sign-in">
                 <Button>
