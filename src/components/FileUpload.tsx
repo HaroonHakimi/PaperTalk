@@ -7,10 +7,13 @@ import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { String } from "aws-sdk/clients/appstream";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
 const FileUpload = () => {
+
+  const router = useRouter()
 
   const [uploading, setUploading] = useState(false)
 
@@ -49,12 +52,13 @@ const FileUpload = () => {
             return
         }
         mutate(data, {
-            onSuccess: (data) => {
-              console.log(data)
-                // toast.success(data.message)
+            onSuccess: (chat_id) => {
+              toast.success("Chat Created!")
+              router.push(`/chat/${chat_id}`)
             },
             onError: (err) => {
                 toast.error("Error creating chat")
+                console.error(err)
             }
         })
       } catch (error) {
@@ -64,7 +68,7 @@ const FileUpload = () => {
       }
     },
   });
-
+ 
   return (
     <div className="p-2 bg-white rounded-xl"> 
       <div
