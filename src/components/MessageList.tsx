@@ -7,13 +7,13 @@ type Props = {
 }
 
 const MessageList = ({messages}: Props) => {
-    if (!messages) {
+    if (!messages || !Array.isArray(messages)) {
         return 
     }
 
     return (
         <div className=" flex flex-col gap-2 px-4">
-            {messages.map(message => (
+            {messages?.map(message => (
                 <div key={message.id}
                 className={cn('flex', {
                     'justify-end pl-10': message.role === 'user',

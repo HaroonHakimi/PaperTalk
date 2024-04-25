@@ -17,14 +17,15 @@ const openai = new OpenAIApi(config)
 
 export async function POST(req: Request) {
     try {
-        const { messages, chatId } = await req.json()
-        const _chats = await db.select().from(chats).where(eq(chats.id, chatId))
-        if (_chats.length !=1) {
-            return NextResponse.json({ 'error': 'chat not found' }, { status: 404 } )
+        const { messages, chatId } = await req.json();
+        const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+        if (_chats.length !== 1) {
+            return NextResponse.json({ 'error': 'Chat not found' }, { status: 404 });
         }
-        const fileKey = _chats[0].fileKey
-        const lastmessage = messages[messages.length - 1]
-        const context = await getContext(lastmessage.content, fileKey)
+        
+        const fileKey = _chats[0].fileKey;
+        const lastMessage = messages[messages.length - 1];
+        const context = await getContext(lastMessage.content, fileKey);
 
         const prompt = {
             role: "system",
@@ -42,38 +43,39 @@ export async function POST(req: Request) {
             AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
             AI assistant will not invent anything that is not drawn directly from the context.
             `,
-          };
+        };
 
         const response = await openai.createChatCompletion({
-            model: 'gpt-3.5-turbo',
+            model: "gpt-3.5-turbo",
             messages: [
                 prompt,
-                ...messages.filter((message: Message) => message.role === 'user')
+                ...messages.filter((message: Message) => message.role === "user"),
             ],
-            stream: true
-        })
+            stream: true,
+        });
 
         const stream = OpenAIStream(response, {
             onStart: async () => {
-                //save user message into db
+                // save user message into db
                 await db.insert(_messages).values({
                     chatId,
-                    messageContent: lastmessage.content,
-                    role: 'user'
-                })
+                    messageContent: lastMessage.content,
+                    role: "user",
+                });
             },
             onCompletion: async (completion) => {
-                //save ai message into db
+                // save AI message into db
                 await db.insert(_messages).values({
                     chatId,
                     messageContent: completion,
-                    role: 'system'
-                })
-            }
-        })
+                    role: "system",
+                });
+            },
+        });
 
-        return new StreamingTextResponse(stream)
+        return new StreamingTextResponse(stream);
     } catch (error) {
-        console.log('error in /api/chat', error)
+        console.error('Error in /api/chat', error);
+        return NextResponse.json({ 'error': 'Internal Server Error' }, { status: 500 });
     }
 }
