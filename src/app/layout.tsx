@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description: "Your PDF Translater",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,9 +22,9 @@ export default function RootLayout({
     <ClerkProvider>
       <Providers>
         <html lang="en">
-          {/* <head>
-            
-          </head> */}
+          <head>
+          <link rel="icon" type="image/png" href="/favicon.ico" />
+          </head>
           <body className={inter.className}>
             {children}
             <Toaster />
