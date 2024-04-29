@@ -38,11 +38,11 @@ export async function getContext(query: string, fileKey: string) {
   );
 
   type Metadata = {
-    text: string,
-    pageNumbe: number
-  }
+    text: string;
+    pageNumber: number;
+  };
 
-  let docs = qualifyingDocs.map(match => (match.metadata as Metadata).text)
-
-  return docs.join("\n").substring(0,3000)
+  let docs = qualifyingDocs.map((match) => (match.metadata as Metadata).text);
+  // 5 vectors
+  return docs.join("\n").substring(0, 3000);
 }

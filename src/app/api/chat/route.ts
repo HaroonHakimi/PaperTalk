@@ -17,12 +17,16 @@ export async function POST(req: Request) {
   try {
     const { messages, chatId } = await req.json();
     const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+
     if (_chats.length != 1) {
       return NextResponse.json({ error: "chat not found" }, { status: 404 });
     }
     const fileKey = _chats[0].fileKey;
     const lastMessage = messages[messages.length - 1];
+    console.log("Last user message:", lastMessage.content);
+
     const context = await getContext(lastMessage.content, fileKey);
+
  
     const prompt = {
       role: "system",
@@ -52,22 +56,35 @@ export async function POST(req: Request) {
     });
     const stream = OpenAIStream(response, {
       onStart: async () => {
-        // save user message into db
-        await db.insert(_messages).values({
-          chatId,
-          content: lastMessage.content,
-          role: "user",
-        });
+        try {
+          // save user message into db
+          await db.insert(_messages).values({
+            chatId,
+            content: lastMessage.content,
+            role: "user",
+          });
+          console.log("User message saved to db:", lastMessage.content); // Log user message insertion
+        } catch (error) {
+          console.error("Error saving user message to db:", error); // Log any errors during user message insertion
+        }
       },
       onCompletion: async (completion) => {
-        // save ai message into db
-        await db.insert(_messages).values({
-          chatId,
-          content: completion,
-          role: "system",
-        });
+        try {
+          // save ai message into db
+          await db.insert(_messages).values({
+            chatId,
+            content: completion,
+            role: "system",
+          });
+          console.log("AI message saved to db:", completion); // Log AI message insertion
+        } catch (error) {
+          console.error("Error saving AI message to db:", error); // Log any errors during AI message insertion
+        }
       },
+      
     });
     return new StreamingTextResponse(stream);
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error processing message:", error);
+  }
 }

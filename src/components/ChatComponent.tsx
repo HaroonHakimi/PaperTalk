@@ -15,10 +15,9 @@ const ChatComponent = ({ chatId }: Props) => {
   const { data, isLoading } = useQuery({
     queryKey: ["chat", chatId],
     queryFn: async () => {
-      const response = await axios.post<Message[]>("/api/get-messages", {
-        chatId,
-      });
-      return response.data;
+      const response = await axios.post<Message[]>("/api/get-messages", {chatId});
+      
+      return response.data  ;
     },
   });
 
@@ -28,7 +27,14 @@ const ChatComponent = ({ chatId }: Props) => {
       chatId,
     },
     initialMessages: data || [],
-  });
+
+  }
+  
+);
+
+  
+
+
   React.useEffect(() => {
     const messageContainer = document.getElementById("message-container");
     if (messageContainer) {

@@ -12,9 +12,10 @@ export const POST = async (req: Request) => {
             return NextResponse.json({ error: "Chat ID is required" }, { status: 400 });
         }
         const _messages = await db.select().from(messages).where(eq(messages.chatId, chatId));
-        return NextResponse.json({ messages: _messages });
+        return NextResponse.json(_messages);
     } catch (error) {
         console.error("Error in /api/get-messages", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 };
+
